@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NODE_ENV } from 'src/common/enums/node-env.enum';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
+import { User } from 'src/modules/users/entities/user.entity';
 config();
 
 export const baseConfig = (configService: ConfigService) => {
