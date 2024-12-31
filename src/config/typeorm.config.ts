@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { NODE_ENV } from 'src/common/enums/node-env.enum';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const baseConfig = (configService: ConfigService) => {
   const config = {
@@ -15,7 +15,7 @@ export const baseConfig = (configService: ConfigService) => {
     subscribers: [__dirname + '/../**/*.subscriber{.ts,.js}'],
     autoLoadEntities: true,
     synchronize: configService.get<string>('NODE_ENV') === NODE_ENV.DEVELOPMENT,
-    logging: configService.get("NODE_ENV") === NODE_ENV.DEVELOPMENT,
+    logging: configService.get<string>("NODE_ENV") === NODE_ENV.DEVELOPMENT,
     migrations: [__dirname + '/migrations/**/*.migration{.ts,.js}'],
     migrationsRun: true,
     migrationsTableName: 'migration_table',
@@ -25,7 +25,7 @@ export const baseConfig = (configService: ConfigService) => {
   }
 
   // Add SSL configuration for production
-  if (configService.get<string>('NODE_ENV') === NODE_ENV.PRODUCTION) {
+  if (configService.get<string>("NODE_ENV") === NODE_ENV.PRODUCTION) {
     return {
       ...config,
       ssl: { rejectUnauthorized: false }, // Explicitly set SSL
@@ -46,3 +46,6 @@ export const dataSourceConfig = (configService: ConfigService): DataSourceOption
     ...baseConfig(configService),
   } as DataSourceOptions;
 };
+
+const configService = new ConfigService();
+export const dataSource = new DataSource(dataSourceConfig(configService));

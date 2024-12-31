@@ -1,10 +1,10 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
-import { MigrationService } from './common/services/migration.service';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -13,16 +13,11 @@ import { MigrationService } from './common/services/migration.service';
     }),
     TypeOrmModule.forRootAsync({
       useFactory: async (configService: ConfigService) => typeOrmConfig(configService),
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MigrationService],
+  providers: [AppService],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly migrationService: MigrationService) { }
-
-  async onModuleInit() {
-    await this.migrationService.initializeDataSource();
-  }
-}
+export class AppModule {}
