@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceConfig, typeOrmConfig } from './config/typeorm.config';
-import { DataSource } from 'typeorm';
+import { typeOrmConfig } from './config/typeorm.config';
+import { MigrationService } from './common/services/migration.service';
 
 @Module({
   imports: [
@@ -17,20 +17,12 @@ import { DataSource } from 'typeorm';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MigrationService],
 })
 export class AppModule implements OnModuleInit {
-  private readonly dataSource: DataSource;
-  constructor(private readonly configService: ConfigService) {
-    this.dataSource = new DataSource(dataSourceConfig(this.configService))
-  }
+  constructor(private readonly migrationService: MigrationService) { }
 
   async onModuleInit() {
-    try {
-      await this.dataSource.initialize();
-      console.log('DataSource initialized for migrations');
-    } catch (error) {
-      console.error('Error during migration dataSource initialization', error);
-    }
+    await this.migrationService.initializeDataSource();
   }
 }
